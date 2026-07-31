@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Especificación funcional · Portal de turnos · Medisel</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#fafbfc; --surface-2:#f2f4f7; --line:#e2e6ec;
+    --text:#1b2129; --muted:#5c6773; --dim:#8c96a3;
+    --accent:#1d6f8e; --accent-soft:#eaf3f7; --accent-line:#bcd8e4;
+    --radius:8px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12161b; --surface:#181d24; --surface-2:#1e242c; --line:#2b333d;
+      --text:#e6ebf1; --muted:#9aa5b1; --dim:#717d8a;
+      --accent:#5fb3d4; --accent-soft:#16262e; --accent-line:#2c4b58;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:0 26px 90px}
+
+  header.hero{padding:52px 0 30px;border-bottom:2px solid var(--accent);margin-bottom:14px}
+  .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:30px;line-height:1.22;margin:12px 0 8px;letter-spacing:-.02em;font-weight:650}
+  .sub{color:var(--muted);max-width:64ch;font-size:16px}
+  .metaline{margin-top:22px;font-size:13.5px;color:var(--dim);display:flex;flex-wrap:wrap;gap:6px 22px}
+  .metaline b{color:var(--muted);font-weight:600}
+
+  .toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;margin:28px 0 44px}
+  .toc h4{margin:0 0 10px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:700}
+  .toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px;font-size:14px}
+  @media (max-width:620px){.toc ol{columns:1}}
+  .toc li{margin:3px 0;break-inside:avoid}
+  .toc a{color:var(--text);text-decoration:none}
+  .toc a:hover{color:var(--accent);text-decoration:underline}
+
+  section{margin-bottom:52px;scroll-margin-top:20px}
+  h2{font-size:20px;letter-spacing:-.01em;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-weight:650}
+  h2 .n{color:var(--accent);font-weight:700;margin-right:12px;font-variant-numeric:tabular-nums;font-size:17px}
+  h3{font-size:16px;margin:30px 0 10px;font-weight:650}
+  h3 .num{color:var(--accent);font-weight:700;margin-right:8px;font-variant-numeric:tabular-nums}
+  p{margin:13px 0}
+  .lede{color:var(--muted);font-size:16px}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.5px}
+  th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-weight:700;padding:0 12px 9px;border-bottom:1.5px solid var(--line)}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.ref{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:650;white-space:nowrap;width:52px}
+  td.c{white-space:nowrap;width:70px;color:var(--muted)}
+  .tbl{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:8px 8px 12px;margin:16px 0;overflow-x:auto}
+
+  ul,ol{margin:13px 0;padding-left:22px}
+  li{margin:6px 0}
+  ul.tight li{margin:3px 0}
+
+  .note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:15px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:20px 0;font-size:15px}
+  .note p:first-child{margin-top:0}.note p:last-child{margin-bottom:0}
+  .note b{color:var(--text)}
+
+  .box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;margin:16px 0}
+  .box h4{margin:0 0 10px;font-size:15px;font-weight:650}
+
+  .entrega{border:1px solid var(--line);border-radius:var(--radius);margin:16px 0;overflow:hidden;background:var(--surface)}
+  .entrega-head{padding:16px 22px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line)}
+  .entrega-head .e{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .entrega-head .t{font-size:17px;font-weight:650;margin-top:4px}
+  .entrega-head .f{font-size:14px;color:var(--muted);margin-top:2px}
+  .entrega-body{padding:16px 22px}
+  .entrega-body ul{margin:0}
+
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.05em;white-space:nowrap;
+       background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line)}
+  .tag.plain{background:transparent;color:var(--dim);border-color:var(--line)}
+
+  .hu{border:1px solid var(--line);border-radius:var(--radius);margin:14px 0;overflow:hidden;background:var(--surface)}
+  .hu-head{padding:12px 20px;background:var(--surface-2);border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+  .hu-head .n{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;font-size:13.5px;letter-spacing:.03em}
+  .hu-head .t{font-weight:650;font-size:15.5px;flex:1;min-width:180px}
+  .hu-body{padding:15px 20px}
+  .hu-quote{border-left:2px solid var(--accent-line);padding-left:14px;margin:0 0 14px;font-size:15px}
+  .hu-quote span{color:var(--dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;display:block}
+  .hu-quote p{margin:2px 0 9px}
+  .hu-quote p:last-child{margin-bottom:0}
+  .hu h5{margin:0 0 8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-weight:700}
+  .hu ol.ac{margin:0;padding-left:20px;font-size:14.5px}
+  .hu ol.ac li{margin:7px 0}
+  .hu ol.ac b{color:var(--accent);font-weight:650}
+  .grupo{margin:34px 0 6px;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:700;padding-bottom:7px;border-bottom:1px solid var(--accent-line)}
+
+  .punto{border:1px solid var(--line);border-radius:var(--radius);margin:14px 0;overflow:hidden;background:var(--surface)}
+  .punto-head{padding:13px 20px;background:var(--surface-2);border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline}
+  .punto-head .n{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+  .punto-head .t{font-weight:650;font-size:15.5px}
+  .punto-body{padding:14px 20px;font-size:14.5px}
+  .punto-body dl{margin:0}
+  .punto-body dt{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-weight:700;margin-top:12px}
+  .punto-body dt:first-child{margin-top:0}
+  .punto-body dd{margin:3px 0 0}
+
+  footer{border-top:1px solid var(--line);padding-top:22px;margin-top:20px;color:var(--dim);font-size:13.5px}
+
+  @media print{
+    body{background:#fff;color:#000;font-size:10.5pt}
+    .toc{break-after:page}
+    section{break-inside:avoid}.entrega,.punto,.box{break-inside:avoid}
+    a{color:#000;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Effency Labs para Medisel Consultorios Médicos</div>
+  <h1>Portal de turnos para exámenes médicos laborales</h1>
+  <div class="sub">Especificación funcional. Describe qué va a hacer el sistema, en qué orden se entrega y qué queda fuera. Es el anexo técnico de la propuesta comercial.</div>
+  <div class="metaline">
+    <span><b>Versión</b> 1.0</span>
+    <span><b>Fecha</b> 30 de julio de 2026</span>
+    <span><b>Basado en</b> Propuesta ME y respuestas del 30/07</span>
+  </div>
+</header>
+
+<div class="toc">
+  <h4>Contenido</h4>
+  <ol>
+    <li><a href="#s1">Qué resuelve el sistema</a></li>
+    <li><a href="#s2">Quiénes lo usan</a></li>
+    <li><a href="#s3">Entregas y fechas</a></li>
+    <li><a href="#s4">Funcionamiento detallado</a></li>
+    <li><a href="#s5">Historias de usuario</a></li>
+    <li><a href="#s6">Reglas de funcionamiento</a></li>
+    <li><a href="#s7">Puntos a confirmar</a></li>
+    <li><a href="#s8">Qué queda fuera del alcance</a></li>
+    <li><a href="#s9">Seguridad y manejo de la información</a></li>
+    <li><a href="#s10">Cómo vamos a trabajar</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+  <h2><span class="n">1</span>Qué resuelve el sistema</h2>
+  <p class="lede">Hoy las empresas piden turnos por mail y Medisel los administra a mano. Con entre 70 y 100 exámenes por semana, ese circuito consume tiempo de mesa de entrada, genera idas y vueltas y no le da a la empresa ninguna visibilidad de en qué estado está cada trabajador.</p>
+  <p>El portal reemplaza ese circuito. La empresa entra con su cuenta, elige el día, carga a sus trabajadores y elige qué exámenes necesita. Medisel ve la agenda de cada jornada, registra quién se presentó y publica los resultados. La empresa entra cuando quiere y ve el estado de cada trabajador, su aptitud y el informe completo para descargar.</p>
+  <p>El objetivo es que el pedido de turnos y la entrega de resultados dejen de pasar por el mail, sin cambiar la forma en que Medisel atiende ni la manera en que se hacen los exámenes.</p>
+</section>
+
+<section id="s2">
+  <h2><span class="n">2</span>Quiénes lo usan</h2>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Perfil</th><th>Qué puede hacer</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Empresa cliente</strong></td>
+        <td>Se registra sola con su CUIT. Carga a sus trabajadores, solicita turnos, cancela, sigue el estado de cada examen y descarga los informes. Una cuenta por empresa</td>
+      </tr>
+      <tr>
+        <td><strong>Mesa de entrada</strong></td>
+        <td>Ve la agenda de cada día, registra el ingreso de cada trabajador, sube el informe del examen, carga la aptitud y la observación del médico y publica el resultado</td>
+      </tr>
+      <tr>
+        <td><strong>Administración</strong></td>
+        <td>Todo lo anterior, más la gestión del listado de adicionales, el calendario de feriados, los cupos, las cuentas de empresa y los usuarios internos</td>
+      </tr>
+      <tr>
+        <td><strong>Prestadores</strong><br><span class="tag plain">Fase 2</span></td>
+        <td>Cada prestador ve el listado de trabajadores que le corresponde atender según su práctica y carga su estudio. No accede a estudios de otras prácticas</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="note">
+    <p>El trabajador no tiene acceso al portal. No recibe avisos ni consulta sus resultados por el sistema. Tal como nos indicaron, es la empresa la que le informa.</p>
+  </div>
+</section>
+
+<section id="s3">
+  <h2><span class="n">3</span>Entregas y fechas</h2>
+  <p class="lede">El portal se entrega en tres etapas. La primera cubre el circuito de turnos, que es el que hoy consume más tiempo de mesa de entrada, y llega para la fecha que necesitan. La segunda incorpora los resultados. La tercera cierra las funciones de consulta y autogestión.</p>
+
+  <div class="entrega">
+    <div class="entrega-head">
+      <div class="e">Entrega 1</div>
+      <div class="t">Portal de turnos operativo</div>
+      <div class="f">Lunes 31 de agosto de 2026</div>
+    </div>
+    <div class="entrega-body">
+      <ul class="tight">
+        <li>Registro y acceso de empresas con CUIT</li>
+        <li>Carga de trabajadores y solicitud de turnos con modalidad, adicionales y aclaraciones</li>
+        <li>Agenda con cupos, días hábiles y feriados</li>
+        <li>Panel diario de mesa de entrada con registro de asistencia</li>
+        <li>Administración del listado de adicionales y del calendario</li>
+        <li>Aviso automático por mail al confirmarse un turno</li>
+      </ul>
+      <p style="margin-bottom:0;font-size:14.5px;color:var(--muted)">Durante septiembre los resultados se siguen enviando por mail, exactamente como hasta ahora. El circuito de resultados no se interrumpe en ningún momento.</p>
+    </div>
+  </div>
+
+  <div class="entrega">
+    <div class="entrega-head">
+      <div class="e">Entrega 2</div>
+      <div class="t">Resultados en el portal</div>
+      <div class="f">Miércoles 30 de septiembre de 2026</div>
+    </div>
+    <div class="entrega-body">
+      <ul class="tight">
+        <li>Carga del informe en PDF, la aptitud y la observación del médico</li>
+        <li>Publicación del resultado a la empresa</li>
+        <li>Listado de seguimiento con aptitud visible y descarga del informe</li>
+        <li>Aviso automático por mail cuando un resultado queda disponible</li>
+        <li>Cancelación de turnos por parte de la empresa</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="entrega">
+    <div class="entrega-head">
+      <div class="e">Entrega 3</div>
+      <div class="t">Consulta y autogestión</div>
+      <div class="f">Sábado 31 de octubre de 2026</div>
+    </div>
+    <div class="entrega-body">
+      <ul class="tight">
+        <li>Historial de exámenes anteriores por trabajador</li>
+        <li>Modificación del cupo diario por parte de Medisel</li>
+        <li>Reprogramación de un turno conservando lo ya cargado</li>
+        <li>Adjuntar archivos en las aclaraciones de la solicitud</li>
+        <li>Consulta del registro de accesos y exportación de listados</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note">
+    <p><b>Sobre la Fase 2.</b> El acceso de los prestadores y el armado automático del informe consolidado se cotizan y planifican por separado, una vez que el portal esté en uso. Es la parte del proyecto que más depende de cómo trabaje cada práctica, y conviene definirla con el sistema ya funcionando en lugar de anticiparla ahora.</p>
+  </div>
+</section>
+
+<section id="s4">
+  <h2><span class="n">4</span>Funcionamiento detallado</h2>
+  <p class="lede">Cada punto lleva un número para que puedan referenciarlo si algo no coincide con lo que esperaban. La columna de la derecha indica en qué entrega está disponible.</p>
+
+  <h3><span class="num">4.1</span>Cuentas de empresa</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.1.1</td><td>La empresa se registra sola indicando CUIT, razón social, mail de contacto y teléfono. No necesita que Medisel la autorice</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.1.2</td><td>El CUIT identifica a la empresa. No puede haber dos cuentas con el mismo CUIT</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.1.3</td><td>Antes de poder pedir turnos, la empresa confirma su mail desde un enlace que le llega a esa casilla. Es lo que evita que alguien registre un CUIT que no le corresponde</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.1.4</td><td>Si la empresa olvida su contraseña, la recupera por mail sin intervención de Medisel</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.1.5</td><td>Medisel puede bloquear una cuenta, desbloquearla, cambiarle el mail de contacto y restablecer su contraseña</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.1.6</td><td>Medisel recibe un aviso cada vez que se registra una empresa nueva</td><td class="c">Entrega 1</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><span class="num">4.2</span>Trabajadores</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.2.1</td><td>La empresa carga a sus trabajadores con apellido, nombre, DNI y puesto</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.2.2</td><td>Al escribir un DNI ya cargado, el sistema completa el resto de los datos automáticamente. No hay que volver a tipear a la misma persona</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.2.3</td><td>Cada empresa ve únicamente a sus propios trabajadores. Aunque una misma persona figure en dos empresas, ninguna ve el registro de la otra</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.2.4</td><td>La ficha de cada trabajador muestra el historial completo de sus exámenes anteriores, con los informes disponibles para descargar</td><td class="c">Entrega 3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><span class="num">4.3</span>Solicitud de turno</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.3.1</td><td>Ve el calendario con los días disponibles y cuántos lugares quedan en cada uno. Los días completos o cerrados no se pueden seleccionar</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.2</td><td>Elige el tipo de examen: ingreso, egreso o periódico</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.3</td><td>Elige la modalidad, Básico de Ley o Básico Completo, con el detalle en pantalla de qué estudios incluye cada una</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.4</td><td>Agrega los adicionales que necesite desde el listado que administra Medisel</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.5</td><td>Escribe aclaraciones libres, por ejemplo si hace falta una planilla o un certificado especial que no esté en el listado</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.6</td><td>Puede cargar varios trabajadores para el mismo día en una sola operación, sin repetir el proceso por cada uno. Cada trabajador genera un turno independiente</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.7</td><td>Antes de confirmar ve un resumen de todo lo solicitado</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.8</td><td>Consulta el listado de todos sus turnos con el estado de cada uno, filtrando por fecha o por estado</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.9</td><td>Si intenta pedir un turno para un trabajador que ya tiene uno pendiente, el sistema se lo indica con la fecha del turno vigente. Evita ocupar dos lugares por un error de carga</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.3.10</td><td>Cancela un turno hasta el día anterior. El lugar queda liberado para otra empresa</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.3.11</td><td>Reprograma un turno a otra fecha sin volver a cargar la modalidad ni los adicionales</td><td class="c">Entrega 3</td></tr>
+      <tr><td class="ref">4.3.12</td><td>Adjunta archivos en PDF junto con las aclaraciones</td><td class="c">Entrega 3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <p><b>Sobre la carga de varios trabajadores.</b> Cargar a varias personas juntas es únicamente una comodidad de la pantalla, para no repetir el formulario. El sistema no guarda ningún concepto de grupo ni de lote: genera un turno independiente por cada trabajador, y a partir de ahí cada uno se consulta, se cancela y se reprograma por separado, exactamente igual que si se hubieran cargado de a uno.</p>
+  </div>
+
+  <h3><span class="num">4.4</span>Agenda y cupos</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.4.1</td><td>El cupo es de 30 trabajadores por día hábil. Cada trabajador citado ocupa un lugar, sin importar la modalidad ni los adicionales</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.4.2</td><td>Los lunes se habilita la agenda de la semana siguiente. Queda disponible hasta agotarse o hasta el viernes de esa semana, tal como funciona hoy</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.4.3</td><td>La atención es de lunes a viernes. Los sábados y domingos no se ofrecen</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.4.4</td><td>Los feriados nacionales no se ofrecen. Los días no laborables sí, porque Medisel trabaja</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.4.5</td><td>Medisel administra el calendario de feriados y puede cerrar una fecha puntual indicando el motivo</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.4.6</td><td>Hay un tope de trabajadores por empresa y por día, para que ninguna empresa ocupe sola toda la agenda. Lo define Medisel</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.4.7</td><td>Si dos empresas intentan tomar el último lugar al mismo tiempo, solo una lo obtiene. No se puede sobrevender un día</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.4.8</td><td>Medisel puede modificar el cupo de un día puntual, por encima o por debajo de los 30 habituales</td><td class="c">Entrega 3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><span class="num">4.5</span>Panel de mesa de entrada</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.5.1</td><td>La agenda del día muestra a todos los trabajadores citados con su empresa, tipo de examen, modalidad, adicionales y aclaraciones</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.5.2</td><td>Se marca a cada trabajador como presente o ausente. La empresa lo ve reflejado en su listado</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.5.3</td><td>Se busca por DNI, apellido o empresa dentro de la agenda del día</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.5.4</td><td>Se consultan agendas de días anteriores y posteriores</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.5.5</td><td>Una marca de asistencia equivocada se puede corregir el mismo día</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.5.6</td><td>Mesa de entrada puede cargar un turno en nombre de una empresa, para casos excepcionales resueltos por teléfono. Hasta entonces esas excepciones se resuelven como hoy</td><td class="c">Entrega 3</td></tr>
+      <tr><td class="ref">4.5.7</td><td>La agenda del día se puede imprimir o exportar</td><td class="c">Entrega 3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><span class="num">4.6</span>Resultados</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.6.1</td><td>Mesa de entrada carga el resultado en un único formulario: sube el informe del examen en un solo PDF, tal como lo arman hoy, elige la aptitud y escribe la observación del médico</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.6.2</td><td>El informe y la aptitud son obligatorios para poder confirmar. La observación es opcional</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.6.3</td><td>Al confirmar el formulario el resultado queda publicado: la empresa lo ve de inmediato en su listado y recibe el aviso por mail. No hay un paso de aprobación posterior</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.6.4</td><td>Si hace falta reemplazar un informe ya publicado, se sube el nuevo y el anterior queda registrado. Nada se pierde y la empresa recibe el aviso de la actualización</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.6.5</td><td>La empresa ve su listado de trabajadores con la aptitud y la observación al lado de los datos de cada uno, y descarga el informe completo desde el mismo listado</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.6.6</td><td>El estado de cada examen es visible para la empresa: reservado, presentado, ausente, en proceso o publicado</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.6.7</td><td>Queda registro de cada descarga de informe, con qué usuario y en qué momento. Sirve para responder cuando una empresa dice no haber recibido un resultado</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.6.8</td><td>El listado de exámenes se exporta a planilla</td><td class="c">Entrega 3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><span class="num">4.7</span>Avisos por mail</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.7.1</td><td>La empresa recibe un mail al confirmarse un turno, con el trabajador, la fecha, el tipo de examen, la modalidad y los adicionales</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.7.2</td><td>Si carga varios trabajadores en una misma operación, recibe un solo mail con el detalle de todos, en lugar de uno por cada uno</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.7.3</td><td>La empresa recibe un mail cuando un resultado queda disponible, con el enlace al portal. El informe no viaja adjunto, se descarga desde el sistema</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.7.4</td><td>La empresa recibe la confirmación cuando cancela un turno</td><td class="c">Entrega 2</td></tr>
+      <tr><td class="ref">4.7.5</td><td>Cada empresa puede indicar un segundo mail que reciba copia de todos los avisos</td><td class="c">Entrega 3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><span class="num">4.8</span>Administración</h3>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">4.8.1</td><td>Medisel da de alta, edita y desactiva adicionales por su cuenta, sin depender de nosotros. Un adicional desactivado deja de ofrecerse pero se mantiene en los turnos ya solicitados</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.8.2</td><td>Medisel administra el calendario de feriados de cada año</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.8.3</td><td>Medisel crea y desactiva los usuarios internos, con su rol correspondiente</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.8.4</td><td>Medisel consulta el listado de empresas registradas, con fecha de alta y actividad</td><td class="c">Entrega 1</td></tr>
+      <tr><td class="ref">4.8.5</td><td>Medisel ajusta los parámetros del sistema: cupo diario, tope por empresa y tamaño máximo de archivo</td><td class="c">Entrega 3</td></tr>
+      <tr><td class="ref">4.8.6</td><td>Medisel consulta el registro de accesos filtrando por empresa, usuario o fecha</td><td class="c">Entrega 3</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="s5">
+  <h2><span class="n">5</span>Historias de usuario</h2>
+  <p class="lede">El capítulo anterior enumera qué hace el sistema. Este describe cómo se comporta en cada situación concreta, incluidos los casos que se salen de lo habitual. Cada historia lleva sus condiciones de aceptación, que son las pruebas que vamos a correr delante de ustedes en cada entrega para dar el punto por terminado.</p>
+
+  <div class="grupo">Empresa cliente</div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-01</span><span class="t">Crear la cuenta de mi empresa</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>responsable de recursos humanos de una empresa cliente</p>
+        <span>Quiero</span><p>registrar a mi empresa en el portal por mi cuenta</p>
+        <span>Para</span><p>empezar a pedir turnos sin tener que coordinarlo antes con Medisel</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que mi empresa no está registrada, <b>cuando</b> completo CUIT, razón social, mail y teléfono, <b>entonces</b> recibo un mail para confirmar mi dirección.</li>
+        <li><b>Dado</b> que todavía no confirmé el mail, <b>cuando</b> intento pedir un turno, <b>entonces</b> el sistema me recuerda que primero tengo que confirmarlo.</li>
+        <li><b>Dado</b> que el CUIT que ingreso ya tiene una cuenta, <b>cuando</b> intento registrarme, <b>entonces</b> el sistema me avisa que esa empresa ya está registrada y me indica cómo recuperar el acceso.</li>
+        <li><b>Dado</b> que ingreso un CUIT con formato inválido, <b>cuando</b> intento continuar, <b>entonces</b> el sistema me lo señala antes de enviar el formulario.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-02</span><span class="t">Elegir un día con lugar disponible</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>empresa cliente</p>
+        <span>Quiero</span><p>ver de un vistazo qué días tienen lugar y cuántos quedan</p>
+        <span>Para</span><p>elegir la fecha sin tener que preguntar por mail ni probar una por una</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que estoy viendo el calendario, <b>entonces</b> cada día habilitado muestra cuántos lugares quedan.</li>
+        <li><b>Dado</b> que un día llegó a su cupo, <b>entonces</b> aparece como completo y no lo puedo seleccionar.</li>
+        <li><b>Dado</b> que un día es sábado, domingo o feriado nacional, <b>entonces</b> no figura entre las opciones.</li>
+        <li><b>Dado</b> que Medisel cerró una fecha puntual, <b>entonces</b> ese día aparece como no disponible.</li>
+        <li><b>Dado</b> que la agenda de la semana siguiente todavía no se habilitó, <b>entonces</b> esos días no figuran hasta el lunes de apertura.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-03</span><span class="t">Pedir turno para un trabajador</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>empresa cliente</p>
+        <span>Quiero</span><p>solicitar el examen de un trabajador indicando qué necesito</p>
+        <span>Para</span><p>que Medisel sepa exactamente qué estudios preparar para ese día</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que elegí una fecha, <b>cuando</b> cargo apellido, nombre, DNI y puesto, elijo el tipo de examen y la modalidad, <b>entonces</b> puedo agregar los adicionales que necesite y escribir aclaraciones.</li>
+        <li><b>Dado</b> que escribo un DNI que ya cargué antes, <b>entonces</b> el sistema completa solo el resto de los datos de esa persona.</li>
+        <li><b>Dado</b> que elegí una modalidad, <b>entonces</b> veo en pantalla qué estudios incluye, y si agrego un adicional que ya está incluido el sistema me lo advierte.</li>
+        <li><b>Dado</b> que completé todo, <b>cuando</b> paso al último paso, <b>entonces</b> veo un resumen de lo solicitado antes de confirmar.</li>
+        <li><b>Dado</b> que confirmo, <b>entonces</b> el turno queda reservado y recibo el mail de confirmación con el detalle.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-04</span><span class="t">Cargar varios trabajadores de una vez</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>empresa cliente que manda grupos de trabajadores</p>
+        <span>Quiero</span><p>cargarlos a todos en una sola operación en lugar de uno por uno</p>
+        <span>Para</span><p>no repetir el proceso completo siete u ocho veces</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que elegí una fecha, <b>cuando</b> cargo un trabajador, <b>entonces</b> puedo agregar otro sin volver a empezar, y cada uno con su propia modalidad y adicionales.</li>
+        <li><b>Dado</b> que cargué varios, <b>cuando</b> confirmo, <b>entonces</b> cada trabajador ocupa un lugar del cupo, queda como un turno independiente y recibo un único mail con el detalle de todos.</li>
+        <li><b>Dado</b> que terminé la carga, <b>entonces</b> en mi listado veo un turno por trabajador. No existe una agrupación posterior: cada uno se consulta y se gestiona por separado.</li>
+        <li><b>Dado</b> que la cantidad que cargo supera el tope diario por empresa, <b>entonces</b> el sistema me avisa cuántos puedo reservar ese día y me deja elegir otra fecha para el resto.</li>
+        <li><b>Dado</b> que quedan menos lugares de los que necesito, <b>entonces</b> el sistema me lo indica antes de confirmar, no después.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-05</span><span class="t">Cancelar un turno</span><span class="tag">Entrega 2</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>empresa cliente</p>
+        <span>Quiero</span><p>cancelar un turno cuando el trabajador no va a poder ir</p>
+        <span>Para</span><p>liberar el lugar y no quedar como que faltamos</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que el turno es para mañana o más adelante, <b>cuando</b> lo cancelo, <b>entonces</b> el lugar se libera para otra empresa y recibo la confirmación por mail.</li>
+        <li><b>Dado</b> que el turno es para hoy, <b>entonces</b> la opción de cancelar ya no está disponible y el sistema me indica que debo comunicarme con Medisel.</li>
+        <li><b>Dado</b> que había cargado varios trabajadores juntos, <b>cuando</b> cancelo el turno de uno, <b>entonces</b> los demás no se ven afectados, porque cada turno es independiente desde el momento en que se confirma.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-06</span><span class="t">Saber en qué estado está cada trabajador</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>empresa cliente</p>
+        <span>Quiero</span><p>ver el estado de todos mis trabajadores en un solo listado</p>
+        <span>Para</span><p>saber quién ya fue, quién faltó y qué exámenes están listos, sin preguntar</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que tengo turnos cargados, <b>entonces</b> veo un listado con cada trabajador, su fecha y su estado, y puedo filtrar por fecha o por estado.</li>
+        <li><b>Dado</b> que Medisel registró el ingreso de un trabajador, <b>entonces</b> su estado pasa a presentado el mismo día.</li>
+        <li><b>Dado</b> que un trabajador no se presentó, <b>entonces</b> su estado queda como ausente y entiendo que necesita un turno nuevo.</li>
+        <li><b>Dado</b> que soy otra empresa, <b>entonces</b> en ningún caso veo trabajadores, turnos ni resultados que no sean míos.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-07</span><span class="t">Recibir y descargar un resultado</span><span class="tag">Entrega 2</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>empresa cliente</p>
+        <span>Quiero</span><p>enterarme cuando un examen está listo y descargarlo cuando lo necesite</p>
+        <span>Para</span><p>dejar de esperar que Medisel me lo mande por mail</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que Medisel publicó un resultado, <b>entonces</b> recibo un mail avisándome, con un enlace al portal y sin el informe adjunto.</li>
+        <li><b>Dado</b> que entro al listado, <b>entonces</b> veo la aptitud y la observación al lado de los datos del trabajador, y puedo descargar el informe completo desde ahí.</li>
+        <li><b>Dado</b> que el examen todavía no fue publicado, <b>entonces</b> el estado figura como en proceso y no hay nada para descargar.</li>
+        <li><b>Dado</b> que reenvío el enlace de descarga a alguien, <b>entonces</b> ese enlace deja de funcionar a los pocos minutos.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-08</span><span class="t">Consultar exámenes anteriores de un trabajador</span><span class="tag">Entrega 3</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>empresa cliente</p>
+        <span>Quiero</span><p>ver todos los exámenes que le hicimos a una misma persona</p>
+        <span>Para</span><p>consultar un preocupacional viejo sin tener que buscarlo en el mail</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que un trabajador tiene más de un examen, <b>cuando</b> abro su ficha, <b>entonces</b> veo todos ordenados por fecha con su tipo, su aptitud y su informe.</li>
+        <li><b>Dado</b> que descargo un informe viejo, <b>entonces</b> obtengo exactamente el archivo que se publicó en ese momento.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="grupo">Mesa de entrada</div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-09</span><span class="t">Preparar la jornada</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>persona de mesa de entrada</p>
+        <span>Quiero</span><p>abrir a primera hora el listado de quiénes vienen hoy y qué necesita cada uno</p>
+        <span>Para</span><p>tener todo preparado sin revisar los mails de la semana</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que entro al panel, <b>entonces</b> veo la agenda del día con cada trabajador, su empresa, el tipo de examen, la modalidad, los adicionales y las aclaraciones.</li>
+        <li><b>Dado</b> que necesito ubicar a alguien, <b>cuando</b> busco por DNI, apellido o empresa, <b>entonces</b> lo encuentro dentro de la agenda del día.</li>
+        <li><b>Dado</b> que quiero anticiparme, <b>entonces</b> puedo consultar las agendas de días siguientes y de días pasados.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-10</span><span class="t">Registrar quién se presentó</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>persona de mesa de entrada</p>
+        <span>Quiero</span><p>marcar a cada trabajador como presente o ausente</p>
+        <span>Para</span><p>que la empresa lo vea sin que tengamos que avisarle</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que un trabajador llega, <b>cuando</b> lo marco presente, <b>entonces</b> la empresa ve el cambio en su listado.</li>
+        <li><b>Dado</b> que terminó la jornada y alguien no vino, <b>cuando</b> lo marco ausente, <b>entonces</b> la empresa lo ve y el lugar no se reasigna.</li>
+        <li><b>Dado</b> que me equivoqué al marcar, <b>cuando</b> lo corrijo el mismo día, <b>entonces</b> el estado se actualiza y queda registrado quién hizo el cambio.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-11</span><span class="t">Cargar y publicar el resultado de un examen</span><span class="tag">Entrega 2</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>persona de mesa de entrada</p>
+        <span>Quiero</span><p>cargar el informe, la aptitud y la observación en un solo paso</p>
+        <span>Para</span><p>que la empresa lo tenga disponible en el momento, sin mandar mails uno por uno</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que el examen está completo e informado por el médico, <b>cuando</b> subo el informe, elijo la aptitud, escribo la observación y confirmo, <b>entonces</b> el resultado queda publicado y la empresa recibe el aviso por mail.</li>
+        <li><b>Dado</b> que intento confirmar sin el informe o sin la aptitud, <b>entonces</b> el sistema me lo señala y no se publica nada.</li>
+        <li><b>Dado</b> que el archivo no es un PDF o supera el tamaño permitido, <b>entonces</b> el sistema me lo indica en el momento de subirlo.</li>
+        <li><b>Dado</b> que confirmé con el archivo equivocado, <b>entonces</b> lo corrijo reemplazándolo, y la empresa recibe el aviso de que hay una versión actualizada.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-12</span><span class="t">Corregir un informe ya publicado</span><span class="tag">Entrega 2</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>persona de mesa de entrada</p>
+        <span>Quiero</span><p>reemplazar un informe que se publicó equivocado</p>
+        <span>Para</span><p>corregirlo sin perder el original ni dejar a la empresa con el archivo viejo</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que un informe ya está publicado, <b>cuando</b> subo uno nuevo, <b>entonces</b> la empresa pasa a ver el nuevo y el anterior queda guardado con la fecha y el usuario que hizo el cambio.</li>
+        <li><b>Dado</b> que reemplacé un informe, <b>entonces</b> la empresa recibe un aviso de que hay una versión actualizada.</li>
+        <li><b>Dado</b> que corrijo solamente la aptitud o la observación, <b>entonces</b> también queda registrado el cambio.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="grupo">Administración</div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-13</span><span class="t">Mantener el listado de adicionales</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>administración de Medisel</p>
+        <span>Quiero</span><p>agregar y sacar adicionales por mi cuenta</p>
+        <span>Para</span><p>no depender de nadie cada vez que sumamos un estudio</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que agrego un adicional, <b>entonces</b> aparece de inmediato entre las opciones que ven las empresas.</li>
+        <li><b>Dado</b> que desactivo un adicional, <b>entonces</b> deja de ofrecerse, pero los turnos que ya lo tenían solicitado lo siguen mostrando tal como se pidió.</li>
+        <li><b>Dado</b> que corrijo el nombre de un adicional, <b>entonces</b> los turnos ya solicitados conservan el texto con el que se pidieron.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-14</span><span class="t">Cerrar un día de atención</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>administración de Medisel</p>
+        <span>Quiero</span><p>cerrar una fecha puntual o cargar un feriado</p>
+        <span>Para</span><p>que nadie reserve un día en el que no vamos a atender</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que cargo un feriado nacional, <b>entonces</b> ese día deja de ofrecerse a las empresas.</li>
+        <li><b>Dado</b> que cierro una fecha que ya tenía turnos reservados, <b>entonces</b> el sistema me avisa cuántos hay para que podamos comunicarnos con esas empresas.</li>
+        <li><b>Dado</b> que un día es no laborable pero atendemos, <b>entonces</b> se sigue ofreciendo con normalidad.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hu">
+    <div class="hu-head"><span class="n">HU-15</span><span class="t">Devolverle el acceso a una empresa</span><span class="tag">Entrega 1</span></div>
+    <div class="hu-body">
+      <div class="hu-quote">
+        <span>Como</span><p>administración de Medisel</p>
+        <span>Quiero</span><p>cambiar el mail y restablecer la contraseña de una cuenta</p>
+        <span>Para</span><p>resolverlo cuando la persona que la creó ya no está en la empresa</p>
+      </div>
+      <h5>Condiciones de aceptación</h5>
+      <ol class="ac">
+        <li><b>Dado</b> que una empresa perdió el acceso, <b>cuando</b> le cambio el mail de contacto, <b>entonces</b> puede recuperar su contraseña con la casilla nueva.</li>
+        <li><b>Dado</b> que hago cualquiera de estos cambios, <b>entonces</b> queda registrado quién lo hizo y cuándo.</li>
+        <li><b>Dado</b> que una cuenta genera problemas, <b>cuando</b> la bloqueo, <b>entonces</b> deja de poder ingresar y de reservar turnos, y su información se conserva.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="n">6</span>Reglas de funcionamiento</h2>
+  <p class="lede">Son las reglas de negocio tal como las entendimos del documento y de sus respuestas. Les pedimos que las revisen una por una, porque el sistema se va a comportar exactamente así.</p>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td class="ref">6.1</td><td>Cada CUIT corresponde a una única cuenta de empresa</td></tr>
+      <tr><td class="ref">6.2</td><td>El turno es por día completo, sin horario asignado. La atención es por orden de llegada</td></tr>
+      <tr><td class="ref">6.3</td><td>Cada turno corresponde a un único trabajador y es independiente. Cargar a varios juntos es solo una comodidad de la pantalla y no genera ninguna agrupación posterior</td></tr>
+      <tr><td class="ref">6.4</td><td>Cada trabajador citado ocupa un lugar del cupo, sin importar qué estudios se le hagan</td></tr>
+      <tr><td class="ref">6.5</td><td>El cupo es de 30 trabajadores por día hábil</td></tr>
+      <tr><td class="ref">6.6</td><td>Los lunes se habilitan los turnos de la semana siguiente, y quedan disponibles hasta agotarse o hasta el viernes de esa semana</td></tr>
+      <tr><td class="ref">6.7</td><td>La atención es de lunes a viernes. Los feriados nacionales el consultorio cierra, los días no laborables trabaja</td></tr>
+      <tr><td class="ref">6.8</td><td>Un turno se puede cancelar hasta las 23:59 del día anterior</td></tr>
+      <tr><td class="ref">6.9</td><td>El trabajador que no se presenta pierde el turno. El lugar no se reasigna y volver requiere sacar un turno nuevo</td></tr>
+      <tr><td class="ref">6.10</td><td>El informe es un único PDF por examen, con todos los estudios incluidos, armado por Medisel como se hace hoy</td></tr>
+      <tr><td class="ref">6.11</td><td>El resultado se carga una vez que el examen está completo e informado por el médico. Al confirmar el formulario de carga queda publicado y la empresa recibe el aviso, sin ningún paso de aprobación adicional</td></tr>
+      <tr><td class="ref">6.12</td><td>El portal no muestra precios ni presupuestos. La cuestión comercial se sigue manejando por mail</td></tr>
+      <tr><td class="ref">6.13</td><td>Los avisos se envían solamente a la empresa, nunca al trabajador</td></tr>
+      <tr><td class="ref">6.14</td><td>Los datos de un examen pertenecen a la empresa que lo solicitó y no son visibles para ninguna otra</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="s7">
+  <h2><span class="n">7</span>Puntos a confirmar</h2>
+  <p class="lede">Al detallar el sistema aparecieron algunas situaciones que el documento no contemplaba. En cada una dejamos nuestra propuesta, así en la reunión alcanza con confirmar o corregir en lugar de definir desde cero.</p>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.1</span><span class="t">Detalles de la apertura semanal de la agenda</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>Los turnos de la semana siguiente se habilitan los lunes. Al llevarlo al sistema quedan tres definiciones sin resolver: a qué hora exacta se habilitan, qué pasa cuando ese lunes es feriado y el consultorio está cerrado, y si en una semana con feriado el total disponible baja de 150 a 120 o se redistribuye entre los días restantes.</dd>
+        <dt>Propuesta</dt>
+        <dd>Que la apertura sea automática a las 8 de la mañana y que ocurra igual aunque el lunes sea feriado, ya que es un proceso del sistema y no requiere que haya alguien en el consultorio. Los días feriados de esa semana simplemente no se ofrecen, con lo cual el total baja solo, sin necesidad de un tope semanal aparte.</dd>
+        <dt>Por qué ahora</dt>
+        <dd>El lunes 17 de agosto es feriado nacional, así que el caso se presenta durante el primer mes de uso. La agenda es además lo primero que construimos, por eso lo necesitamos definido en la reunión.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.2</span><span class="t">Valores posibles de aptitud</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>El documento menciona apto A, B y C. No aparece un valor para el trabajador no apto, ni para el examen que todavía está en curso.</dd>
+        <dt>Necesitamos</dt>
+        <dd>La lista completa y cerrada, con el texto exacto de cada valor tal como quieren que se vea en pantalla. Si falta alguno, mesa de entrada va a terminar escribiéndolo en el campo de observaciones, que es justamente lo que queremos evitar.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.3</span><span class="t">Tope de turnos por empresa</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>Sin un límite, una empresa grande podría ocupar los 30 lugares de un día y dejar a las demás sin disponibilidad. Hoy eso lo equilibran ustedes al administrar los mails.</dd>
+        <dt>Propuesta</dt>
+        <dd>Un tope de 10 trabajadores por empresa y por día, modificable por ustedes en cualquier momento. Contempla a la empresa que manda 7 u 8 y evita el caso extremo.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.4</span><span class="t">Composición de cada modalidad</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>La audiometría figura como adicional y también está incluida en el Básico Completo. Una empresa podría pedirla dos veces sin darse cuenta.</dd>
+        <dt>Necesitamos</dt>
+        <dd>El detalle exacto de qué estudios incluye cada modalidad. Con eso el sistema lo muestra en pantalla al momento de elegir y avisa cuando un adicional ya está cubierto.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.5</span><span class="t">Validación del CUIT</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>El sistema verifica que el CUIT tenga formato válido, pero no consulta ningún padrón oficial.</dd>
+        <dt>Propuesta</dt>
+        <dd>Que siga así, sumando la confirmación por mail del punto 4.1.3 y el aviso a Medisel del 4.1.6. La consulta al padrón de ARCA es una integración adicional que se puede evaluar más adelante.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.6</span><span class="t">Peso de los informes</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>Un examen completo escaneado con todos sus estudios puede ser un archivo pesado, sobre todo si el escáner trabaja a alta resolución y en color.</dd>
+        <dt>Necesitamos</dt>
+        <dd>Dos o tres exámenes reales, con los datos tapados, para medir el peso habitual antes de fijar el límite de subida. No corre para la Entrega 1, lo necesitamos hacia mediados de septiembre.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.7</span><span class="t">Redacción de los adicionales</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>En el listado de ejemplo figura "Psicotécnico x 3" y no nos queda claro si son tres pruebas distintas, tres unidades del mismo estudio o alguna otra cosa.</dd>
+        <dt>Necesitamos</dt>
+        <dd>El texto tal como quieren que lo lea la empresa. Vale para toda la lista: cárguenla como quieren que se vea, porque desde la Entrega 1 la administran ustedes.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="punto">
+    <div class="punto-head"><span class="n">7.8</span><span class="t">Cantidad de sedes</span></div>
+    <div class="punto-body">
+      <dl>
+        <dt>Situación</dt>
+        <dd>Todo el sistema está pensado sobre una única sede de atención, con una sola agenda y un solo cupo diario.</dd>
+        <dt>Necesitamos</dt>
+        <dd>La confirmación. Si atendieran en más de un lugar, la agenda y los cupos funcionan distinto y conviene saberlo antes de empezar.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id="s8">
+  <h2><span class="n">8</span>Qué queda fuera del alcance</h2>
+  <p class="lede">Lo listamos de forma explícita para que no haya expectativas distintas. Nada de esto está incluido, y cualquiera de estos puntos se puede evaluar y cotizar por separado más adelante.</p>
+  <div class="tbl">
+  <table>
+    <tbody>
+      <tr><td>Migración de los registros de la base de datos actual</td></tr>
+      <tr><td>Validación del CUIT contra el padrón de ARCA</td></tr>
+      <tr><td>Presupuestos, facturación o pagos dentro del portal</td></tr>
+      <tr><td>Avisos por WhatsApp</td></tr>
+      <tr><td>Lista de espera cuando se libera un lugar por una cancelación</td></tr>
+      <tr><td>Aplicación móvil. El portal se ve bien en el celular, pero no es una app que se instale</td></tr>
+      <tr><td>Acceso del trabajador a sus propios resultados</td></tr>
+      <tr><td>Turnos con horario asignado. El circuito es por orden de llegada</td></tr>
+      <tr><td>Varios usuarios por empresa con permisos distintos. Cada empresa tiene una cuenta</td></tr>
+      <tr><td>Firma digital de los informes médicos</td></tr>
+      <tr><td>Integración con equipos de diagnóstico</td></tr>
+      <tr><td>Generación digital de estudios. La audiometría, la espirometría y demás se siguen escaneando</td></tr>
+      <tr><td>Acceso de los prestadores y armado automático del informe consolidado, que corresponden a la Fase 2</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="s9">
+  <h2><span class="n">9</span>Seguridad y manejo de la información</h2>
+  <p class="lede">El portal guarda resultados de exámenes médicos, así que el manejo de esa información se trató como parte del diseño y no como un agregado.</p>
+  <ul>
+    <li><strong>Cada empresa accede solamente a su información.</strong> Es la regla más importante del sistema y se verifica de forma automática cada vez que publicamos una actualización.</li>
+    <li><strong>Los informes no quedan accesibles desde enlaces públicos.</strong> Cada descarga usa un enlace propio que vence a los pocos minutos, así que un enlace reenviado o guardado en el historial de un navegador no sirve para entrar después.</li>
+    <li><strong>Queda registro de cada descarga,</strong> con qué cuenta y en qué momento. Es lo que les permite responder con certeza cuando una empresa consulta por un resultado.</li>
+    <li><strong>Los informes no se sobrescriben ni se borran.</strong> Si hay que reemplazar uno, el anterior queda guardado.</li>
+    <li><strong>La información está cifrada y se respalda todos los días,</strong> con posibilidad de recuperar el estado del sistema a un momento anterior. Antes de salir a producción probamos una restauración completa.</li>
+    <li><strong>El acceso se hace siempre por conexión segura,</strong> con las contraseñas guardadas de forma que ni nosotros podemos leerlas.</li>
+  </ul>
+  <div class="note">
+    <p>La información del portal es de Medisel. Effency Labs la administra únicamente para prestar el servicio, mantiene reserva sobre ella y la entrega o elimina cuando ustedes lo indiquen. Esto queda asentado en el contrato.</p>
+  </div>
+</section>
+
+<section id="s10">
+  <h2><span class="n">10</span>Cómo vamos a trabajar</h2>
+
+  <h3><span class="num">10.1</span>Seguimiento</h3>
+  <p>Van a tener acceso a una versión de prueba del sistema desde la primera semana, para ver el avance en vivo y no solo al final. Hacemos dos demostraciones de veinte minutos, el <strong>7 y el 21 de agosto</strong>, donde recorremos lo construido y toman nota de lo que quieran ajustar.</p>
+  <p>El portal se pone en funcionamiento el <strong>24 de agosto</strong>, una semana antes de la entrega formal. Esa semana es para que mesa de entrada lo use con casos reales y corrijamos lo que aparezca sin apuro.</p>
+
+  <h3><span class="num">10.2</span>Capacitación y documentación</h3>
+  <p>Antes de la entrega hacemos una capacitación de una hora con las personas de mesa de entrada que van a operar el sistema, y les dejamos un manual breve. También preparamos una guía de dos páginas para que le envíen a las empresas cuando les avisen del portal.</p>
+
+  <h3><span class="num">10.3</span>Qué necesitamos de ustedes</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Qué</th><th style="width:130px">Cuándo</th></tr></thead>
+    <tbody>
+      <tr><td>Una persona designada como referente, para validar y decidir</td><td>Al inicio</td></tr>
+      <tr><td>Definición de los ocho puntos del capítulo 7</td><td>En la reunión</td></tr>
+      <tr><td>Detalle de qué estudios incluye cada modalidad</td><td>11 de agosto</td></tr>
+      <tr><td>Listado de adicionales, aunque esté incompleto</td><td>11 de agosto</td></tr>
+      <tr><td>Logo, colores y una casilla de mail institucional para los avisos</td><td>11 de agosto</td></tr>
+      <tr><td>Devoluciones de cada demostración</td><td>Dentro de las 48 horas hábiles</td></tr>
+      <tr><td>Disponibilidad de mesa de entrada para la capacitación</td><td>26 de agosto</td></tr>
+      <tr><td>Dos o tres exámenes reales con los datos tapados</td><td>10 de septiembre</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><span class="num">10.4</span>Sobre las fechas</h3>
+  <p>Las fechas de las tres entregas se sostienen siempre que el proyecto se confirme antes del <strong>4 de agosto</strong>, que las devoluciones lleguen dentro de las 48 horas hábiles y que el alcance descrito en este documento no se modifique durante el desarrollo.</p>
+  <p>No lo planteamos como una formalidad. Con un plazo de cuatro semanas para la primera entrega, cada día de demora en una definición es un día menos de desarrollo. Si surge algo nuevo durante el proyecto, lo incorporamos a la Entrega 3 o lo cotizamos aparte, para no poner en riesgo la fecha del 31 de agosto.</p>
+</section>
+
+<footer>
+  Effency Labs · Especificación funcional del portal de turnos para Medisel Consultorios Médicos · Versión 1.0, 30 de julio de 2026 · Anexo técnico de la propuesta comercial
+</footer>
+
+</div>
+</body>
+</html>

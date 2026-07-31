@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presupuesto · Portal de turnos · Medisel</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#fafbfc; --surface-2:#f2f4f7; --line:#e2e6ec;
+    --text:#1b2129; --muted:#5c6773; --dim:#8c96a3;
+    --accent:#1d6f8e; --accent-soft:#eaf3f7; --accent-line:#bcd8e4;
+    --radius:8px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12161b; --surface:#181d24; --surface-2:#1e242c; --line:#2b333d;
+      --text:#e6ebf1; --muted:#9aa5b1; --dim:#717d8a;
+      --accent:#5fb3d4; --accent-soft:#16262e; --accent-line:#2c4b58;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:0 26px 90px}
+
+  header.hero{padding:52px 0 30px;border-bottom:2px solid var(--accent);margin-bottom:16px}
+  .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:30px;line-height:1.22;margin:12px 0 8px;letter-spacing:-.02em;font-weight:650}
+  .sub{color:var(--muted);max-width:62ch;font-size:16px}
+  .metaline{margin-top:22px;font-size:13.5px;color:var(--dim);display:flex;flex-wrap:wrap;gap:6px 22px}
+  .metaline b{color:var(--muted);font-weight:600}
+
+  section{margin-bottom:46px;scroll-margin-top:20px}
+  h2{font-size:19.5px;letter-spacing:-.01em;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line);font-weight:650}
+  h2 .n{color:var(--accent);font-weight:700;margin-right:12px;font-variant-numeric:tabular-nums;font-size:17px}
+  h3{font-size:15.5px;margin:26px 0 8px;font-weight:650}
+  p{margin:13px 0}
+  .lede{color:var(--muted);font-size:16px}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.5px}
+  th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-weight:700;padding:0 12px 9px;border-bottom:1.5px solid var(--line)}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+  td.c{white-space:nowrap;color:var(--muted)}
+  tfoot td{border-top:1.5px solid var(--line);border-bottom:none;padding-top:12px;font-weight:700}
+  .tbl{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:8px 8px 12px;margin:16px 0;overflow-x:auto}
+
+  ul,ol{margin:13px 0;padding-left:22px}
+  li{margin:6px 0}
+  ul.tight li{margin:3px 0}
+  ul.si{list-style:none;padding-left:0}
+  ul.si li{padding-left:24px;position:relative}
+  ul.si li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+  ul.no{list-style:none;padding-left:0}
+  ul.no li{padding-left:24px;position:relative;color:var(--muted)}
+  ul.no li::before{content:"·";position:absolute;left:6px;color:var(--dim);font-weight:700;font-size:20px;line-height:1}
+
+  .note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:15px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:20px 0;font-size:15px}
+  .note p:first-child{margin-top:0}.note p:last-child{margin-bottom:0}
+  .note b{color:var(--text)}
+
+  .opcion{border:1px solid var(--line);border-radius:var(--radius);margin:18px 0;overflow:hidden;background:var(--surface)}
+  .opcion.destacada{border:2px solid var(--accent)}
+  .opcion-head{padding:18px 22px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line);display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .opcion-head .izq .e{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .opcion-head .izq .t{font-size:18px;font-weight:650;margin-top:3px}
+  .opcion-head .precio{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .opcion-head .precio small{font-size:13px;font-weight:600;color:var(--muted);display:block;text-align:right;letter-spacing:0}
+  .opcion-body{padding:16px 22px}
+  .opcion-body p:first-child{margin-top:0}
+  .opcion-body ul{margin-bottom:0}
+
+  .hito{display:flex;gap:16px;padding:13px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .hito:last-child{border-bottom:none}
+  .hito .fecha{font-size:13px;color:var(--accent);font-weight:700;min-width:118px;font-variant-numeric:tabular-nums}
+  .hito .desc{flex:1}
+  .hito .desc b{display:block}
+  .hito .desc span{font-size:14px;color:var(--muted)}
+
+  footer{border-top:1px solid var(--line);padding-top:22px;margin-top:20px;color:var(--dim);font-size:13.5px}
+  .firma{margin-top:36px;padding-top:26px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:40px}
+  @media (max-width:600px){.firma{grid-template-columns:1fr;gap:28px}}
+  .firma div{padding-top:44px;border-top:1px solid var(--dim);font-size:13.5px;color:var(--muted)}
+
+  @media print{
+    body{background:#fff;color:#000;font-size:10.5pt}
+    section{break-inside:avoid}.opcion,.note{break-inside:avoid}
+    a{color:#000;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Effency Labs</div>
+  <h1>Presupuesto · Portal de turnos para exámenes médicos laborales</h1>
+  <div class="sub">Propuesta económica para Medisel Consultorios Médicos. El detalle de todo lo que incluye el desarrollo está en el documento de especificación funcional que acompaña a este presupuesto.</div>
+  <div class="metaline">
+    <span><b>Fecha</b> 30 de julio de 2026</span>
+    <span><b>Validez</b> 15 días</span>
+    <span><b>Presupuesto</b> ME-2026-01</span>
+  </div>
+</header>
+
+<section id="resumen">
+  <h2><span class="n">1</span>Qué estamos cotizando</h2>
+  <p class="lede">Un portal web donde las empresas cliente de Medisel solicitan los turnos de sus trabajadores, siguen la asistencia y descargan los resultados, y donde Medisel administra la agenda, registra el ingreso y publica los informes.</p>
+  <p>Ustedes pidieron dos cotizaciones: la propuesta completa del documento que nos enviaron y una versión acotada al circuito de turnos. Preparamos las dos, y les sumamos el detalle de qué incluye cada una y cuándo estaría disponible.</p>
+  <p>El alcance funcional completo, las reglas de funcionamiento, las historias de usuario y los puntos que quedan por definir están en el documento <strong>Especificación funcional</strong>, que forma parte de este presupuesto y es el que define qué se entrega.</p>
+</section>
+
+<section id="opciones">
+  <h2><span class="n">2</span>Opciones</h2>
+
+  <div class="opcion destacada">
+    <div class="opcion-head">
+      <div class="izq">
+        <div class="e">Opción A</div>
+        <div class="t">Portal de turnos y resultados</div>
+      </div>
+      <div class="precio">USD 3.800<small>pago en 4 hitos</small></div>
+    </div>
+    <div class="opcion-body">
+      <p>Es la versión acotada que nos pidieron cotizar. Cubre el circuito completo desde que la empresa pide el turno hasta que descarga el informe, con la carga de resultados hecha por mesa de entrada tal como se arma hoy.</p>
+      <ul class="si tight">
+        <li>Registro y acceso de empresas por CUIT</li>
+        <li>Carga de trabajadores y solicitud de turnos con modalidad, adicionales y aclaraciones</li>
+        <li>Agenda con cupos, días hábiles, feriados y tope por empresa</li>
+        <li>Panel diario de mesa de entrada con registro de asistencia</li>
+        <li>Carga y publicación de informes, aptitud y observación del médico</li>
+        <li>Seguimiento y descarga por parte de la empresa</li>
+        <li>Avisos automáticos por mail de turno confirmado y resultado disponible</li>
+        <li>Administración de adicionales, feriados, cupos y cuentas</li>
+        <li>Historial de exámenes por trabajador y reprogramación de turnos</li>
+        <li>Capacitación y manuales de uso</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="opcion">
+    <div class="opcion-head">
+      <div class="izq">
+        <div class="e">Opción B</div>
+        <div class="t">Alcance completo, con acceso de prestadores</div>
+      </div>
+      <div class="precio">USD 6.500<small>pago en 5 hitos</small></div>
+    </div>
+    <div class="opcion-body">
+      <p>Todo lo de la Opción A, más la digitalización del circuito interno que describe su documento original.</p>
+      <ul class="si tight">
+        <li>Usuario para cada prestador, con acceso acotado a su práctica</li>
+        <li>Derivación automática de qué estudios le corresponden a cada práctica según el examen solicitado</li>
+        <li>Carga de cada estudio por parte del prestador, digital o escaneado</li>
+        <li>Armado automático del informe consolidado en un PDF único</li>
+        <li>Estado de examen informado por el médico, que habilita la publicación</li>
+      </ul>
+      <p style="margin-bottom:0;font-size:14.5px;color:var(--muted)">Contratada de entrada, esta opción representa un ahorro de USD 500 frente a sumar la segunda etapa más adelante.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <p><b>Si prefieren decidir después.</b> Pueden empezar por la Opción A y evaluar la etapa de prestadores una vez que el portal esté en uso. Contratada por separado, esa etapa tiene un valor de <strong>USD 3.200</strong> y se planifica con fechas propias. Es una alternativa razonable: con el sistema funcionando van a tener mucha más claridad sobre cómo quieren que trabaje cada práctica.</p>
+  </div>
+</section>
+
+<section id="cronograma">
+  <h2><span class="n">3</span>Cronograma de entregas</h2>
+  <p class="lede">El portal se entrega en tres etapas. La primera llega para la fecha que necesitan y cubre el circuito de turnos, que es el que hoy consume más tiempo de mesa de entrada.</p>
+
+  <div class="tbl" style="padding:14px 22px">
+    <div class="hito">
+      <div class="fecha">31 de agosto</div>
+      <div class="desc"><b>Entrega 1 · Portal de turnos operativo</b><span>La empresa solicita turnos y ustedes administran la agenda diaria. Durante septiembre los resultados se siguen enviando por mail, exactamente como hasta ahora.</span></div>
+    </div>
+    <div class="hito">
+      <div class="fecha">30 de septiembre</div>
+      <div class="desc"><b>Entrega 2 · Resultados en el portal</b><span>Carga y publicación de informes, descarga por parte de la empresa y avisos automáticos. Cancelación de turnos online.</span></div>
+    </div>
+    <div class="hito">
+      <div class="fecha">31 de octubre</div>
+      <div class="desc"><b>Entrega 3 · Consulta y autogestión</b><span>Historial por trabajador, reprogramación, autogestión de cupos, adjuntos y exportación de listados.</span></div>
+    </div>
+    <div class="hito">
+      <div class="fecha">A convenir</div>
+      <div class="desc"><b>Etapa de prestadores</b><span>Solo en la Opción B, o contratada por separado. Se planifica con el portal ya en uso.</span></div>
+    </div>
+  </div>
+
+  <p>El portal se pone en funcionamiento el <strong>24 de agosto</strong>, una semana antes de la entrega formal, para que mesa de entrada lo use con casos reales y podamos corregir lo que aparezca sin apuro.</p>
+</section>
+
+<section id="pago">
+  <h2><span class="n">4</span>Forma de pago</h2>
+  <p class="lede">El pago se divide en hitos atados a entregas concretas. No se abona nada contra una etapa que no esté funcionando.</p>
+
+  <h3>Opción A</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Hito</th><th class="c">Momento</th><th class="num">Importe</th></tr></thead>
+    <tbody>
+      <tr><td>Anticipo, 40%</td><td class="c">A la firma</td><td class="num">USD 1.520</td></tr>
+      <tr><td>Entrega 1, 30%</td><td class="c">31 de agosto</td><td class="num">USD 1.140</td></tr>
+      <tr><td>Entrega 2, 20%</td><td class="c">30 de septiembre</td><td class="num">USD 760</td></tr>
+      <tr><td>Entrega 3, 10%</td><td class="c">31 de octubre</td><td class="num">USD 380</td></tr>
+    </tbody>
+    <tfoot><tr><td colspan="2">Total</td><td class="num">USD 3.800</td></tr></tfoot>
+  </table>
+  </div>
+
+  <h3>Opción B</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Hito</th><th class="c">Momento</th><th class="num">Importe</th></tr></thead>
+    <tbody>
+      <tr><td>Anticipo, 40%</td><td class="c">A la firma</td><td class="num">USD 2.600</td></tr>
+      <tr><td>Entrega 1, 25%</td><td class="c">31 de agosto</td><td class="num">USD 1.625</td></tr>
+      <tr><td>Entrega 2, 15%</td><td class="c">30 de septiembre</td><td class="num">USD 975</td></tr>
+      <tr><td>Entrega 3, 10%</td><td class="c">31 de octubre</td><td class="num">USD 650</td></tr>
+      <tr><td>Etapa de prestadores, 10%</td><td class="c">Al cierre</td><td class="num">USD 650</td></tr>
+    </tbody>
+    <tfoot><tr><td colspan="2">Total</td><td class="num">USD 6.500</td></tr></tfoot>
+  </table>
+  </div>
+</section>
+
+<section id="abono">
+  <h2><span class="n">5</span>Servicio mensual</h2>
+  <div class="opcion">
+    <div class="opcion-head">
+      <div class="izq">
+        <div class="e">Abono</div>
+        <div class="t">Alojamiento, respaldo y soporte</div>
+      </div>
+      <div class="precio">USD 120<small>por mes</small></div>
+    </div>
+    <div class="opcion-body">
+      <p>Comienza con la puesta en funcionamiento del portal, el 24 de agosto, y se factura por mes vencido.</p>
+      <h3 style="margin-top:18px">Incluye</h3>
+      <ul class="si tight">
+        <li>Alojamiento del portal y de la base de datos</li>
+        <li>Dominio propio y certificado de seguridad</li>
+        <li>Almacenamiento de todos los informes, sin límite de cantidad ni de antigüedad</li>
+        <li>Respaldo diario automático, con posibilidad de restaurar el sistema a un momento anterior</li>
+        <li>Monitoreo de disponibilidad y alertas ante caídas</li>
+        <li>Soporte por mail en días hábiles, con respuesta dentro de las 24 horas</li>
+        <li>Corrección de errores del sistema, sin cargo y sin límite</li>
+        <li>Hasta 3 horas mensuales de cambios menores: textos, ajustes de parámetros, correcciones de datos</li>
+      </ul>
+      <h3 style="margin-top:20px">No incluye</h3>
+      <ul class="no tight">
+        <li>Funcionalidades nuevas, que se cotizan aparte</li>
+        <li>La etapa de prestadores, si no fue contratada</li>
+        <li>Migración de información desde sistemas anteriores</li>
+        <li>Capacitaciones adicionales más allá de la inicial</li>
+      </ul>
+      <p style="margin-bottom:0;font-size:14.5px;color:var(--muted)">Las horas de cambios menores no se acumulan de un mes al siguiente. Si un pedido excede ese margen, se avisa antes de hacerlo y se acuerda cómo seguir.</p>
+    </div>
+  </div>
+</section>
+
+<section id="condiciones">
+  <h2><span class="n">6</span>Condiciones</h2>
+
+  <h3>Comerciales</h3>
+  <ul>
+    <li>Los valores están expresados en dólares estadounidenses y no incluyen impuestos.</li>
+    <li>El pago se realiza en pesos, al tipo de cambio del día de cada hito.</li>
+    <li>Este presupuesto tiene una validez de 15 días desde su fecha de emisión.</li>
+    <li>El desarrollo comienza una vez acreditado el anticipo.</li>
+  </ul>
+
+  <h3>Sobre las fechas</h3>
+  <p>Las fechas de entrega se sostienen siempre que se cumplan estas condiciones. No las planteamos como una formalidad: con cuatro semanas hasta la primera entrega, cada día de demora en una definición es un día menos de desarrollo.</p>
+  <ul>
+    <li>Propuesta aceptada y anticipo acreditado <strong>antes del 4 de agosto</strong>.</li>
+    <li>Una persona designada como referente, para validar y decidir.</li>
+    <li>Definición de los ocho puntos del capítulo 7 de la especificación funcional en la reunión inicial.</li>
+    <li>Devoluciones de cada demostración dentro de las 48 horas hábiles.</li>
+    <li>El alcance descrito en la especificación funcional no se modifica durante el desarrollo.</li>
+  </ul>
+  <p>Si alguna de estas condiciones no se cumple, la fecha de entrega se corre en la misma cantidad de días. Si durante el proyecto surge un pedido nuevo, lo incorporamos a la Entrega 3 o lo cotizamos por separado, para no poner en riesgo la fecha del 31 de agosto.</p>
+
+  <h3>Sobre la información</h3>
+  <p>Toda la información cargada en el portal es propiedad de Medisel. Effency Labs la administra únicamente para prestar el servicio, mantiene reserva sobre ella, y la entrega o elimina cuando ustedes lo indiquen.</p>
+
+  <h3>Qué no está incluido</h3>
+  <p>El capítulo 8 de la especificación funcional lista en detalle todo lo que queda fuera del alcance. Los puntos principales son: migración de la base de datos actual, validación del CUIT contra el padrón de ARCA, facturación o pagos dentro del portal, avisos por WhatsApp, aplicación móvil, acceso del trabajador a sus resultados, y generación digital de estudios. Cualquiera de estos puntos se puede evaluar y cotizar más adelante.</p>
+</section>
+
+<section id="siguiente">
+  <h2><span class="n">7</span>Cómo seguimos</h2>
+  <p class="lede">Tres pasos y arrancamos.</p>
+  <ol>
+    <li><strong>Revisen la especificación funcional.</strong> Es el documento que define qué se entrega. Si algo no coincide con lo que esperaban, es el momento de decirlo.</li>
+    <li><strong>Coordinamos la reunión.</strong> Media hora alcanza para cerrar los ocho puntos del capítulo 7 y confirmar el alcance.</li>
+    <li><strong>Confirman la opción elegida.</strong> Con el anticipo acreditado antes del 4 de agosto, el portal de turnos está operativo el 31.</li>
+  </ol>
+  <p>Quedamos a disposición por cualquier duda sobre este presupuesto o sobre el alcance.</p>
+
+  <div class="firma">
+    <div>Por Effency Labs</div>
+    <div>Por Medisel Consultorios Médicos</div>
+  </div>
+</section>
+
+<footer>
+  Effency Labs · Presupuesto ME-2026-01 · 30 de julio de 2026 · Acompaña al documento de Especificación funcional del portal de turnos
+</footer>
+
+</div>
+</body>
+</html>
