@@ -87,14 +87,36 @@
 
   footer{border-top:1px solid var(--line);padding-top:22px;margin-top:20px;color:var(--dim);font-size:13.5px}
 
+  .btn-print{position:fixed;top:18px;right:18px;z-index:10;
+    display:inline-flex;align-items:center;gap:7px;
+    font:inherit;font-size:13.5px;font-weight:600;
+    padding:8px 14px;color:var(--muted);background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;
+    transition:color .15s ease,border-color .15s ease,background .15s ease}
+  .btn-print:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+  .btn-print:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn-print svg{width:15px;height:15px;flex:none}
+  @media (max-width:640px){.btn-print{top:10px;right:10px;padding:7px 11px;font-size:13px}}
+
   @media print{
     body{background:#fff;color:#000;font-size:10.5pt}
     section{break-inside:avoid}.opcion,.note{break-inside:avoid}
     a{color:#000;text-decoration:none}
+    .btn-print{display:none}
   }
 </style>
 </head>
 <body>
+
+<button type="button" class="btn-print" onclick="window.print()" title="Imprimir o guardar como PDF">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M6 9V2h12v7"/>
+    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+    <rect x="6" y="14" width="12" height="8" rx="1"/>
+  </svg>
+  Imprimir
+</button>
+
 <div class="wrap">
 
 <header class="hero">
