@@ -17,17 +17,21 @@ medisel-docs/
 │   ├── presupuesto.html
 │   ├── especificacion-funcional.html
 │   └── .nojekyll                    ← evita que Jekyll procese el HTML
-├── interno/                         ← NO se publica en el sitio
+├── interno/                         ← SOLO LOCAL, fuera de git
 │   ├── plan-de-proyecto.html
 │   └── srs-tecnico.html
 └── sync.ps1                         ← re-copia los HTMLs desde Downloads
 ```
 
-### ⚠️ Sobre `interno/`
+### Sobre `interno/`
 
-Estos documentos **no aparecen en el sitio**, pero el repo es público: cualquiera que navegue el código de GitHub puede verlos. No son secretos, pero tampoco están pensados para el cliente.
+Estos dos documentos **existen sólo en tu máquina**. Están en `.gitignore`, no se versionan y nunca llegaron ni van a llegar a GitHub.
 
-Si en algún momento necesitás que sean realmente privados, la movida es sacarlos a un repo privado aparte (`git rm -r interno/` acá).
+El motivo es que el repo es público: cualquiera que diera con él podría leer el plan de proyecto —que tiene horas, márgenes, capacidad real y análisis de riesgo— y el SRS. Nada de eso está pensado para el cliente.
+
+Se sincronizan igual con `sync.ps1` desde `Downloads`, así que el flujo de actualización no cambia. Simplemente no se commitean.
+
+**Si alguna vez necesitás versionarlos**, creá un repo privado aparte y movelos ahí. No los agregues acá con `git add -f`: volverían a quedar públicos.
 
 ## Actualizar los documentos
 
@@ -44,12 +48,12 @@ GitHub Pages redeploya solo en 1–2 minutos.
 
 Si preferís copiar a mano, el mapeo es:
 
-| Archivo en Downloads | Destino en el repo |
-|---|---|
-| `CLIENTE  Medisel  Presupuesto.html` | `docs/presupuesto.html` |
-| `CLIENTE  Medisel  Especificacion funcional.html` | `docs/especificacion-funcional.html` |
-| `INTERNO  Medisel  Plan de proyecto.html` | `interno/plan-de-proyecto.html` |
-| `INTERNO  Medisel  SRS tecnico.html` | `interno/srs-tecnico.html` |
+| Archivo en Downloads | Destino | Se versiona |
+|---|---|---|
+| `CLIENTE  Medisel  Presupuesto.html` | `docs/presupuesto.html` | Sí |
+| `CLIENTE  Medisel  Especificacion funcional.html` | `docs/especificacion-funcional.html` | Sí |
+| `INTERNO  Medisel  Plan de proyecto.html` | `interno/plan-de-proyecto.html` | **No, sólo local** |
+| `INTERNO  Medisel  SRS tecnico.html` | `interno/srs-tecnico.html` | **No, sólo local** |
 
 ## Agregar un documento nuevo para el cliente
 

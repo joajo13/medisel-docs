@@ -15,3 +15,7 @@ desktop.ini
 # Temporales
 *.tmp
 *.bak
+
+# Documentos internos: NO van al repo publico.
+# Se conservan en local y se sincronizan con sync.ps1
+interno/
